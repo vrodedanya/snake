@@ -1,19 +1,67 @@
 #include "function.h"
 #include <iostream>
 
+Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height)
+{
+	this->renderer = renderer;
+	this->width = width;
+	this->height = height;
+	range = width / 30;
+	size = 3;
+	rect = new SDL_Rect[size];
+	for (int i = 0 ; i < size ; i++)
+	{
+		rect[i].h = range;
+		rect[i].w = range;
+		rect[i].x = -i * range;
+		rect[i].y = 0;
+	}
+	dir = {1, 0};
+}
+Snake::~Snake()
+{
+	delete[] rect;
+}
 
-void snake_move(const unsigned int& size, SDL_Rect* rect, const SDL_Point& dir, const unsigned int& range, const int& w, const int& h)
+void Snake::motion(SDL_Event event)
+{
+	const Uint8* state = SDL_GetKeyboardState(NULL);
+
+	if (state[SDL_SCANCODE_W] && rect[1].x != rect[0].x && rect[1].y != rect[0].y + (-1 * range))
+	{
+		dir.x = 0;
+		dir.y = -1;
+	}
+	if (state[SDL_SCANCODE_A] && rect[1].y != rect[0].y && rect[1].x != rect[0].x + (-1 * range))
+	{
+		dir.x = -1;
+		dir.y = 0;
+	}
+	if (state[SDL_SCANCODE_S] && rect[1].x != rect[0].x && rect[1].y != rect[0].y + range)
+	{
+		dir.x = 0;
+		dir.y = 1;
+	}
+	if (state[SDL_SCANCODE_D] && rect[1].y != rect[0].y && rect[1].x != rect[0].x + range)
+	{
+		dir.x = 1;
+		dir.y = 0;
+	}
+}
+
+void Snake::move()
 {
 	SDL_Point buf, add_buf;
 	buf.x = rect[0].x;
 	buf.y = rect[0].y;
 	rect[0].x += range * dir.x;
-	if (rect[0].x >= w) rect[0].x = 0;
-	else if (rect[0].x < 0) rect[0].x = w - rect[0].w;
+
+	if (rect[0].x >= (int)width) rect[0].x = 0;
+	else if (rect[0].x < 0) rect[0].x = width - rect[0].w;
 
 	rect[0].y += range * dir.y;	
-	if (rect[0].y >= h) rect[0].y = 0;
-	else if (rect[0].y < 0) rect[0].y = h - rect[0].h;
+	if (rect[0].y >= (int)height) rect[0].y = 0;
+	else if (rect[0].y < 0) rect[0].y = height - rect[0].h;
 
 	for (register unsigned int i = 1 ; i < size ; i++)
 	{
@@ -34,7 +82,7 @@ void snake_move(const unsigned int& size, SDL_Rect* rect, const SDL_Point& dir, 
 	}
 }
 
-bool eat_apple(unsigned int& size, SDL_Rect*& rect, const SDL_Rect& apple, const unsigned int& range)
+bool Snake::eat_apple(const SDL_Rect& apple)
 {
 	if (rect[0].x == apple.x && rect[0].y == apple.y)
 	{
@@ -53,20 +101,28 @@ bool eat_apple(unsigned int& size, SDL_Rect*& rect, const SDL_Rect& apple, const
 	return false;
 }
 
-bool snake_check(const unsigned int& size, const SDL_Rect* rect) 
+bool Snake::check()
 {
 	for(register int unsigned i = 1; i < size ; i++)
 	{
-		if (rect[0].x == rect[i].x && rect[0].y == rect[i].y) return false;
+		if (rect[0].x == rect[i].x && rect[0].y == rect[i].y) 
+		{
+			for (int i = 0 ; i < size ; i++)
+			{
+				std::cout << rect[i].x << "|" << rect[i].y << std::endl;
+			}
+			return false;
+		}
 	}
 	return true;
 }
 
-void snake_render(SDL_Renderer* renderer, const unsigned int& size, const SDL_Rect* rect)
+void Snake::render()
 {
 	for (register int unsigned i = 0 ; i < size ; i++)
 	{
 		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
+		if (i == 0) SDL_SetRenderDrawColor(renderer, 0, 170, 0, 0);
 		SDL_RenderFillRect(renderer, &rect[i]);
 	}
 }

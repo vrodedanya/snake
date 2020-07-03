@@ -1,9 +1,28 @@
 #pragma once
 #include <SDL2/SDL.h>
-bool eat_apple(unsigned int& size, SDL_Rect*& rect, const SDL_Rect& apple, const unsigned int& range);
+class Snake
+{
+public:
+	Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height);
 
-bool snake_check(const unsigned int& size, const SDL_Rect* rect);
+	~Snake();
 
-void snake_move(const unsigned int& size, SDL_Rect* rect, const SDL_Point& point, const unsigned int& range, const int& w, const int& h);
+	bool eat_apple(const SDL_Rect& apple);
 
-void snake_render(SDL_Renderer* renderer, const unsigned int& size, const SDL_Rect* rect);
+	bool check();
+
+	void move();
+
+	void render();
+
+	void motion(SDL_Event event);
+
+private:
+	SDL_Renderer* renderer;
+	unsigned int width;
+	unsigned int height;
+	SDL_Rect* rect;
+	unsigned int size;
+	int range;
+	SDL_Point dir;
+};
