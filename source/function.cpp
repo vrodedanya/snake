@@ -1,19 +1,20 @@
 #include "function.h"
 #include <iostream>
 
-Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height)
+Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height, int range)
 {
 	this->renderer = renderer;
 	this->width = width;
 	this->height = height;
-	range = width / 30;
+	this->range = range;
 	size = 3;
 	rect = new SDL_Rect[size];
 	for (int i = 0 ; i < size ; i++)
 	{
 		rect[i].h = range;
 		rect[i].w = range;
-		rect[i].x = -i * range;
+		rect[i].x =  -i * range;
+		std::cout << -i << " " << range << " " << -i * range << " " << rect[i].x << std::endl;
 		rect[i].y = 0;
 	}
 	dir = {1, 0};
@@ -21,6 +22,15 @@ Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height)
 Snake::~Snake()
 {
 	delete[] rect;
+}
+
+bool Snake::isSnake(const SDL_Rect& apple)
+{
+	for (int i = 0 ; i < size ; i++)
+	{
+		if (apple.x == rect[i].x && apple.y == rect[i].y) return true;
+	}
+	return false;
 }
 
 void Snake::motion(SDL_Event event)
@@ -107,10 +117,6 @@ bool Snake::check()
 	{
 		if (rect[0].x == rect[i].x && rect[0].y == rect[i].y) 
 		{
-			for (int i = 0 ; i < size ; i++)
-			{
-				std::cout << rect[i].x << "|" << rect[i].y << std::endl;
-			}
 			return false;
 		}
 	}

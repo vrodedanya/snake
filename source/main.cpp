@@ -14,14 +14,18 @@ int main()
 	SDL_Window* window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	Snake snake(renderer, w, h);
+	int range = w / 20;
+	Snake snake(renderer, w, h, range);
 
 	srand(time(NULL));
 
-	int range = w / 30;
 
-	SDL_Rect apple = {rand()%(w / range)* range, rand()%(h / range) * range, range, range};
-
+	SDL_Rect apple;
+   	
+	do
+	{
+		apple = {rand()%(w / range)* range, rand()%(h / range) * range, range, range};
+	} while(snake.isSnake(apple));
 	SDL_Event event;
 	time_t start = clock();
 	time_t end = clock();
@@ -43,8 +47,11 @@ int main()
 
 			if (snake.eat_apple(apple))
 			{
-				apple.x = rand()%(w/range) * range;
-				apple.y = rand()%(h/range) * range;
+				do
+				{
+					apple.x = rand()%(w/range) * range;
+					apple.y = rand()%(h/range) * range;
+				} while (snake.isSnake(apple));
 			}
 			snake.move();
 			isWork = snake.check();

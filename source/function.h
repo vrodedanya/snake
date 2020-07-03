@@ -3,13 +3,15 @@
 class Snake
 {
 public:
-	Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height);
+	Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height, int range);
 
 	~Snake();
 
 	bool eat_apple(const SDL_Rect& apple);
 
 	bool check();
+
+	bool isSnake(const SDL_Rect& apple);
 
 	void move();
 
