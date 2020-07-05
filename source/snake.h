@@ -1,6 +1,5 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include <vector>
 
 class Snake
 {
@@ -11,7 +10,7 @@ public:
 
 	bool eat_apple(const SDL_Rect& apple);
 
-	bool check(std::vector<Snake>& list);
+	bool check();
 
 	bool isSnake(const SDL_Rect& apple);
 
@@ -32,19 +31,21 @@ public:
 	virtual void motion(const SDL_Rect& apple);
 
 protected:
+
 	SDL_Renderer* renderer;
+	SDL_Rect* rect;
+	SDL_Point dir;
+
 	unsigned int width;
 	unsigned int height;
-	bool isMotion;
-	SDL_Rect* rect;
 	unsigned int size;
 	int range;
-	SDL_Point dir;
 };
 
 class Player : public Snake
 {
-	public:
+public:
+	// call Snake constructor
 	using Snake::Snake;
 
 	void motion(SDL_Event event);

@@ -1,5 +1,4 @@
 #include "snake.h"
-#include <iostream>
 
 Snake::Snake(SDL_Renderer* renderer, int x, int y, unsigned int width, unsigned int height, int range)
 {
@@ -7,10 +6,9 @@ Snake::Snake(SDL_Renderer* renderer, int x, int y, unsigned int width, unsigned 
 	this->width = width;
 	this->height = height;
 	this->range = range;
-	isMotion = false;
 	size = 3;
 	rect = new SDL_Rect[size];
-	for (int i = 0 ; i < size ; i++)
+	for (register unsigned int i = 0 ; i < size ; i++)
 	{
 		rect[i].h = range;
 		rect[i].w = range;
@@ -26,7 +24,7 @@ Snake::~Snake()
 
 bool Snake::isSnake(const SDL_Rect& apple)
 {
-	for (int i = 0 ; i < size ; i++)
+	for (register unsigned int i = 0 ; i < size ; i++)
 	{
 		if (apple.x == rect[i].x && apple.y == rect[i].y) return true;
 	}
@@ -55,7 +53,7 @@ void Snake::motion(const SDL_Rect& apple)
 
 void Snake::move()
 {
-	SDL_Point buf, add_buf;
+	SDL_Point buf = {0, 0}, add_buf = {0, 0};
 	buf.x = rect[0].x;
 	buf.y = rect[0].y;
 	rect[0].x += range * dir.x;
@@ -92,7 +90,7 @@ bool Snake::eat_apple(const SDL_Rect& apple)
 	{
 		size++;
 		SDL_Rect* buf = new SDL_Rect[size];
-		for(int i = 0 ; i < (size - 1) ; i++)
+		for(register unsigned int i = 0 ; i < (size - 1) ; i++)
 		{
 			buf[i] = rect[i];
 		}
@@ -105,7 +103,7 @@ bool Snake::eat_apple(const SDL_Rect& apple)
 	return false;
 }
 
-bool Snake::check(std::vector<Snake>& list)
+bool Snake::check()
 {
 	for(register int unsigned i = 1; i < size ; i++)
 	{
