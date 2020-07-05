@@ -1,6 +1,5 @@
 #include <SDL2/SDL.h>
-#include "function.h"
-#include <SDL2/SDL_keyboard.h>
+#include "snake.h"
 #include <ctime>
 #include <iostream>
 
@@ -15,17 +14,17 @@ int main()
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	int range = w / 20;
-	Snake snake(renderer, w, h, range);
+	Player player(renderer, w, h, range);
 
 	srand(time(NULL));
-
 
 	SDL_Rect apple;
    	
 	do
 	{
 		apple = {rand()%(w / range)* range, rand()%(h / range) * range, range, range};
-	} while(snake.isSnake(apple));
+	} while(player.isSnake(apple));
+
 	SDL_Event event;
 	time_t start = clock();
 	time_t end = clock();
@@ -45,19 +44,19 @@ int main()
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 			SDL_RenderClear(renderer);
 
-			if (snake.eat_apple(apple))
+			if (player.eat_apple(apple))
 			{
 				do
 				{
 					apple.x = rand()%(w/range) * range;
 					apple.y = rand()%(h/range) * range;
-				} while (snake.isSnake(apple));
+				} while (player.isSnake(apple));
 			}
-			snake.move();
-			isWork = snake.check();
+			player.move();
+			isWork = player.check();
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 			SDL_RenderFillRect(renderer, &apple);
-			snake.render();
+			player.render();
 			while (SDL_PollEvent(&event))
 			{
 				const Uint8* state = SDL_GetKeyboardState(NULL);
@@ -77,7 +76,7 @@ int main()
 
 			SDL_RenderPresent(renderer);
 		}
-		snake.motion(event);			
+		player.motion(event);			
 		end = clock();
 	}
 

@@ -1,4 +1,4 @@
-#include "function.h"
+#include "snake.h"
 #include <iostream>
 
 Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height, int range)
@@ -7,6 +7,7 @@ Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height, in
 	this->width = width;
 	this->height = height;
 	this->range = range;
+	isMotion = false;
 	size = 3;
 	rect = new SDL_Rect[size];
 	for (int i = 0 ; i < size ; i++)
@@ -33,31 +34,9 @@ bool Snake::isSnake(const SDL_Rect& apple)
 	return false;
 }
 
-void Snake::motion(SDL_Event event)
+void Snake::motion()
 {
-	const Uint8* state = SDL_GetKeyboardState(NULL);
-
-	if (state[SDL_SCANCODE_W] && rect[1].x != rect[0].x && rect[1].y != rect[0].y + (-1 * range))
-	{
-		dir.x = 0;
-		dir.y = -1;
 	}
-	if (state[SDL_SCANCODE_A] && rect[1].y != rect[0].y && rect[1].x != rect[0].x + (-1 * range))
-	{
-		dir.x = -1;
-		dir.y = 0;
-	}
-	if (state[SDL_SCANCODE_S] && rect[1].x != rect[0].x && rect[1].y != rect[0].y + range)
-	{
-		dir.x = 0;
-		dir.y = 1;
-	}
-	if (state[SDL_SCANCODE_D] && rect[1].y != rect[0].y && rect[1].x != rect[0].x + range)
-	{
-		dir.x = 1;
-		dir.y = 0;
-	}
-}
 
 void Snake::move()
 {
@@ -132,4 +111,28 @@ void Snake::render()
 		SDL_RenderFillRect(renderer, &rect[i]);
 	}
 }
+void Player::motion(SDL_Event event) 
+{
+	const Uint8* state = SDL_GetKeyboardState(NULL);
 
+	if (state[SDL_SCANCODE_W] && rect[1].x != rect[0].x && rect[1].y != rect[0].y + (-1 * range))
+	{
+		dir.x = 0;
+		dir.y = -1;
+	}
+	if (state[SDL_SCANCODE_A] && rect[1].y != rect[0].y && rect[1].x != rect[0].x + (-1 * range))
+	{
+		dir.x = -1;
+		dir.y = 0;
+	}
+	if (state[SDL_SCANCODE_S] && rect[1].x != rect[0].x && rect[1].y != rect[0].y + range)
+	{
+		dir.x = 0;
+		dir.y = 1;
+	}
+	if (state[SDL_SCANCODE_D] && rect[1].y != rect[0].y && rect[1].x != rect[0].x + range)
+	{
+		dir.x = 1;
+		dir.y = 0;
+	}
+}

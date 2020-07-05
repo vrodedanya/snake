@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
+
 class Snake
 {
 public:
@@ -17,14 +18,23 @@ public:
 
 	void render();
 
-	void motion(SDL_Event event);
+	virtual void motion();
 
-private:
+protected:
 	SDL_Renderer* renderer;
 	unsigned int width;
 	unsigned int height;
+	bool isMotion;
 	SDL_Rect* rect;
 	unsigned int size;
 	int range;
 	SDL_Point dir;
+};
+
+class Player : public Snake
+{
+	public:
+	using Snake::Snake;
+
+	void motion(SDL_Event event);
 };
