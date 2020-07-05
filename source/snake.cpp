@@ -1,11 +1,22 @@
 #include "snake.h"
+#include <iostream>
+unsigned int Snake::ID = 0;
 
-Snake::Snake(SDL_Renderer* renderer, int x, int y, unsigned int width, unsigned int height, int range)
+Snake::Snake(SDL_Renderer* renderer, int r, int g, int b, int x, int y, unsigned int width, unsigned int height, int range)
 {
 	this->renderer = renderer;
 	this->width = width;
 	this->height = height;
 	this->range = range;
+
+	color.r = r;
+	color.g = g;
+	color.b = b;
+	color.a = 0;
+
+
+	snake_id = ID;
+	ID++;
 	size = 3;
 	rect = new SDL_Rect[size];
 	for (register unsigned int i = 0 ; i < size ; i++)
@@ -20,15 +31,6 @@ Snake::Snake(SDL_Renderer* renderer, int x, int y, unsigned int width, unsigned 
 Snake::~Snake()
 {
 	delete[] rect;
-}
-
-bool Snake::isSnake(const SDL_Rect& apple)
-{
-	for (register unsigned int i = 0 ; i < size ; i++)
-	{
-		if (apple.x == rect[i].x && apple.y == rect[i].y) return true;
-	}
-	return false;
 }
 
 void Snake::motion(const SDL_Rect& apple)
@@ -103,13 +105,33 @@ bool Snake::eat_apple(const SDL_Rect& apple)
 	return false;
 }
 
-bool Snake::check()
+bool Snake::check_collision(const SDL_Rect& r)
+{
+	for (register unsigned int i = 0 ; i < size ; i++)
+	{
+		if (rect[i].x == r.x && rect[i].y == r.y) return true;
+	}
+	return false;
+}
+
+bool Snake::check(const std::vector<Snake*>& list)
 {
 	for(register int unsigned i = 1; i < size ; i++)
 	{
 		if (rect[0].x == rect[i].x && rect[0].y == rect[i].y) 
 		{
 			return false;
+		}
+	}
+
+	for (Snake* i : list)
+	{
+		if (i->get_id() != this->snake_id)
+		{
+			for (register unsigned int j = 0 ; j < i->get_size() ; j++)
+			{
+				if (i->check_collision(rect[0])) return false;
+			}
 		}
 	}
 
@@ -120,8 +142,8 @@ void Snake::render()
 {
 	for (register int unsigned i = 0 ; i < size ; i++)
 	{
-		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
-		if (i == 0) SDL_SetRenderDrawColor(renderer, 0, 170, 0, 0);
+		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
+		if (i == 0) SDL_SetRenderDrawColor(renderer, color.r * 0.6, color.g * 0.6, color.b * 0.6, 0);
 		SDL_RenderFillRect(renderer, &rect[i]);
 	}
 }

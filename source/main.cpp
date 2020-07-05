@@ -2,23 +2,40 @@
 #include "snake.h"
 #include <ctime>
 #include <iostream>
+#include <vector>
+
+bool isFree(const std::vector<Snake*>& list, const SDL_Rect& apple)
+{
+	for (Snake* item : list)
+	{
+		if (item->check_collision(apple)) return true;
+	}
+	return false;
+}
 
 int main()
 {
+	SDL_Init(SDL_INIT_EVERYTHING);
+	srand(time(NULL));
+	
 	bool isWork = true;
 
 	unsigned int w = 600;
 	unsigned int h = 600;
-
+	int range = w / 20;
+	
 	SDL_Window* window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	int range = w / 20;
+	std::vector<Snake*> list;
 
-	Player player(renderer, 0, 0, w, h, range);
-	Snake bot(renderer, range * 5, 0, w, h, range);
+// Objects creating
+	Player* player = new Player(renderer, 0, 255, 0, 0, 0, w, h, range);
+	Snake* bot = new Snake(renderer, 0, 0, 255, range * 5, 0, w, h, range);
 
-	srand(time(NULL));
+// Adding objects to vector
+	list.push_back(player);
+	list.push_back(bot);
 
 	SDL_Rect apple;
    	
@@ -28,9 +45,11 @@ int main()
 		apple.y = rand()%(h / range) * range;
 		apple.w = range;
 	   	apple.h = range;
-	} while(player.isSnake(apple) || bot.isSnake(apple));
+	} while(isFree(list, apple));
 
 	SDL_Event event;
+
+// FPS control
 	time_t start = clock();
 	time_t end = clock();
 	
@@ -49,33 +68,39 @@ int main()
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 			SDL_RenderClear(renderer);
 
-			if (player.eat_apple(apple))
+			for (Snake* i : list)
 			{
-				do
+				if (i->eat_apple(apple))
 				{
-					apple.x = rand()%(w/range) * range;
-					apple.y = rand()%(h/range) * range;
-				} while (player.isSnake(apple));
+					do
+					{
+						apple.x = rand()%(w/range) * range;
+						apple.y = rand()%(h/range) * range;
+					} while (isFree(list, apple));
+				}
 			}
-			if (bot.eat_apple(apple))
-			{
-				do
-				{
-					apple.x = rand()%(w/range) * range;
-					apple.y = rand()%(h/range) * range;
-				} while (player.isSnake(apple));
-			}
+
 			// Move all objects
-			player.move();
-			bot.move();
+			for (Snake* item : list)
+			{
+				item->move();
+			}
 			// Check collision
-			isWork = player.check();
+			for (Snake* item : list)
+			{
+				if (!item->check(list))
+				{
+					isWork = false;
+					break;
+				}
+			}
 			// Render objects
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 			SDL_RenderFillRect(renderer, &apple);
-			player.render();
-			bot.render();
-
+			for (Snake* item : list)
+			{
+				item->render();
+			}
 			// EventHandler
 			while (SDL_PollEvent(&event))
 			{
@@ -92,9 +117,20 @@ int main()
 			}
 			SDL_RenderPresent(renderer);
 		}
-		player.motion(event);			
-		bot.motion(apple);
+		player->motion(event);
+		for (Snake* item : list)
+		{
+			if (item != player)
+			{
+				item->motion(apple);
+			}
+		}
 		end = clock();
+	}
+
+	for (Snake* item : list)
+	{
+		delete item;
 	}
 
 	return 0;
