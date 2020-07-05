@@ -1,7 +1,7 @@
 #include "snake.h"
 #include <iostream>
 
-Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height, int range)
+Snake::Snake(SDL_Renderer* renderer, int x, int y, unsigned int width, unsigned int height, int range)
 {
 	this->renderer = renderer;
 	this->width = width;
@@ -14,9 +14,8 @@ Snake::Snake(SDL_Renderer* renderer, unsigned int width, unsigned int height, in
 	{
 		rect[i].h = range;
 		rect[i].w = range;
-		rect[i].x =  -i * range;
-		std::cout << -i << " " << range << " " << -i * range << " " << rect[i].x << std::endl;
-		rect[i].y = 0;
+		rect[i].x =  -i * range + x;
+		rect[i].y = y;
 	}
 	dir = {1, 0};
 }
@@ -34,9 +33,25 @@ bool Snake::isSnake(const SDL_Rect& apple)
 	return false;
 }
 
-void Snake::motion()
+void Snake::motion(const SDL_Rect& apple)
 {
+	if (apple.x > rect[0].x && rect[0].x + range != rect[1].x)
+	{
+		dir.x = 1;
+		dir.y = 0;
 	}
+	else if (apple.x < rect[0].x && rect[0].x - range != rect[1].x)
+	{
+		dir.x = -1;
+		dir.y = 0;
+	}
+	else
+	{
+		dir.x = 0;
+		if (apple.y > rect[0].y && rect[0].y + range != rect[1].y) dir.y = 1;
+		else if (rect[0].y - range != rect[1].y) dir.y = -1;
+	}
+}
 
 void Snake::move()
 {
@@ -90,7 +105,7 @@ bool Snake::eat_apple(const SDL_Rect& apple)
 	return false;
 }
 
-bool Snake::check()
+bool Snake::check(std::vector<Snake>& list)
 {
 	for(register int unsigned i = 1; i < size ; i++)
 	{
@@ -99,6 +114,7 @@ bool Snake::check()
 			return false;
 		}
 	}
+
 	return true;
 }
 

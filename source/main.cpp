@@ -2,6 +2,7 @@
 #include "snake.h"
 #include <ctime>
 #include <iostream>
+#include <vector>
 
 int main()
 {
@@ -13,9 +14,12 @@ int main()
 	SDL_Window* window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	int range = w / 20;
-	Player player(renderer, w, h, range);
+	std::vector<Snake> list;
 
+	int range = w / 20;
+	Player player(renderer, 0, 0, w, h, range);
+	Snake bot(renderer, range * 5, 0, w, h, range);
+	list.push_back(bot);
 	srand(time(NULL));
 
 	SDL_Rect apple;
@@ -23,7 +27,7 @@ int main()
 	do
 	{
 		apple = {rand()%(w / range)* range, rand()%(h / range) * range, range, range};
-	} while(player.isSnake(apple));
+	} while(player.isSnake(apple) || bot.isSnake(apple));
 
 	SDL_Event event;
 	time_t start = clock();
@@ -52,17 +56,26 @@ int main()
 					apple.y = rand()%(h/range) * range;
 				} while (player.isSnake(apple));
 			}
+			if (bot.eat_apple(apple))
+			{
+				do
+				{
+					apple.x = rand()%(w/range) * range;
+					apple.y = rand()%(h/range) * range;
+				} while (player.isSnake(apple));
+			}
 			player.move();
-			isWork = player.check();
+			bot.move();
+			isWork = player.check(list);
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 			SDL_RenderFillRect(renderer, &apple);
 			player.render();
+			bot.render();
 			while (SDL_PollEvent(&event))
 			{
 				const Uint8* state = SDL_GetKeyboardState(NULL);
 				if (event.type == SDL_QUIT)
 				{
-					isWork = false;
 					break;
 				}
 
@@ -77,6 +90,7 @@ int main()
 			SDL_RenderPresent(renderer);
 		}
 		player.motion(event);			
+		bot.motion(apple);
 		end = clock();
 	}
 
