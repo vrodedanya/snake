@@ -1,17 +1,9 @@
 #include <SDL2/SDL.h>
 #include "snake.h"
+#include "apple.h"
 #include <ctime>
 #include <iostream>
 #include <vector>
-
-bool isFree(const std::vector<Snake*>& list, const SDL_Rect& apple)
-{
-	for (Snake* item : list)
-	{
-		if (item->check_collision(apple)) return true;
-	}
-	return false;
-}
 
 int main()
 {
@@ -37,15 +29,9 @@ int main()
 	list.push_back(player);
 	list.push_back(bot);
 
-	SDL_Rect apple;
-   	
-	do
-	{
-		apple.x = rand()%(w / range) * range;
-		apple.y = rand()%(h / range) * range;
-		apple.w = range;
-	   	apple.h = range;
-	} while(isFree(list, apple));
+	Apple* apple = new Apple(renderer, w, h, range);
+
+	apple->spawn(list);
 
 	SDL_Event event;
 
@@ -70,13 +56,9 @@ int main()
 
 			for (Snake* i : list)
 			{
-				if (i->eat_apple(apple))
+				if (i->eat_apple(apple->get_rect()))
 				{
-					do
-					{
-						apple.x = rand()%(w/range) * range;
-						apple.y = rand()%(h/range) * range;
-					} while (isFree(list, apple));
+					apple->spawn(list);
 				}
 			}
 
@@ -95,8 +77,7 @@ int main()
 				}
 			}
 			// Render objects
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-			SDL_RenderFillRect(renderer, &apple);
+			apple->render();
 			for (Snake* item : list)
 			{
 				item->render();
@@ -122,7 +103,7 @@ int main()
 		{
 			if (item != player)
 			{
-				item->motion(apple);
+				item->motion(apple->get_rect());
 			}
 		}
 		end = clock();
@@ -132,6 +113,7 @@ int main()
 	{
 		delete item;
 	}
+	delete apple;
 
 	return 0;
 }
