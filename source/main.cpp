@@ -26,11 +26,10 @@ int main()
 	Snake* bot = new Snake(renderer, 0, 0, 255, range * 5, 0, w, h, range);
 
 // Adding objects to vector
-	list.push_back(player);
+	//list.push_back(player);
 	list.push_back(bot);
 
 	Apple* apple = new Apple(renderer, w, h, range);
-
 	apple->spawn(list);
 
 	SDL_Event event;
@@ -98,7 +97,7 @@ int main()
 			}
 			SDL_RenderPresent(renderer);
 		}
-		player->motion(event);
+		//player->motion(event);
 		for (Snake* item : list)
 		{
 			if (item != player)

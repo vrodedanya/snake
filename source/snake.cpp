@@ -51,6 +51,45 @@ void Snake::motion(const SDL_Rect& apple)
 		if (apple.y > rect[0].y && rect[0].y + range != rect[1].y) dir.y = 1;
 		else if (rect[0].y - range != rect[1].y) dir.y = -1;
 	}
+
+	bool isLock_x = false;
+	bool isLock_y = false;
+	for (register unsigned int i = 1 ; i < size ; i++)
+	{
+		if (rect[0].x + range * dir.x == rect[i].x && rect[0].y + range * dir.y == rect[i].y)
+		{
+			if (dir.y == 0 && isLock_y == false)
+			{
+				isLock_x = true;
+				dir.x = 0;
+				if (rect[i - 1].y < rect[i].y) dir.y = 1;
+				else dir.y = -1;
+			}
+			else if (dir.x == 0 && isLock_x == false)
+			{
+				isLock_y = true;
+				if (rect[i - 1].x < rect[i].x) dir.x = 1;
+				else dir.x = -1;
+				dir.y = 0;
+			}
+			else if (dir.y == 0 && isLock_y == true)
+			{
+				dir.x = -1;
+				isLock_x = true;
+			}
+			else if (dir.x == 0 && isLock_x == true)
+			{
+				dir.y = -1;
+				isLock_y = true;
+			}
+			else if (isLock_x == true && isLock_y == true)
+			{
+				exit(1);
+			}
+			i = 1;
+		}
+	}
+
 }
 
 void Snake::move()
